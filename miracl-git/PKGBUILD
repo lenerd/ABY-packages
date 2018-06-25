@@ -1,0 +1,39 @@
+# Maintainer: Lennart Braun <lenerd@posteo.de>
+pkgname=miracl-git
+pkgver=r45.ad433b4
+pkgrel=1
+pkgdesc="Multiprecision Integer and Rational Arithmetic Cryptographic Library"
+arch=('x86_64')
+url="https://github.com/miracl/MIRACL.git"
+license=('AGPL3')
+groups=()
+depends=()
+makedepends=('git' 'cmake')
+provides=("${pkgname%-VCS}")
+conflicts=("${pkgname%-VCS}")
+replaces=()
+backup=()
+options=()
+install=
+source=("${pkgname}::git+https://github.com/encryptogroup/MIRACL.git")
+noextract=()
+md5sums=('SKIP')
+
+pkgver() {
+	cd "$srcdir/${pkgname}"
+	printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
+
+build() {
+    mkdir -p "$srcdir/build"
+    cd "$srcdir/build"
+    cmake "$srcdir/${pkgname}" \
+        -DCMAKE_INSTALL_PREFIX="/usr" \
+        -DCMAKE_BUILD_TYPE=Release
+    make
+}
+
+package() {
+    cd "$srcdir/build"
+    make DESTDIR="$pkgdir/" install
+}
